@@ -1,0 +1,39 @@
+#股票分析学习
+import pandas as pd
+#from pandas_datareader import data
+
+gafataDict = {'谷歌':'GOOG','亚马逊':'AMZN','Facebook':'FB',
+            '苹果':'AAPL','阿里巴巴':'BABA','腾讯':'0700.hk'}
+
+#start_date = '2017-01-01'
+#end_date = '2018-01-01'
+#babaDf = data.get_data_yahoo(gafataDict['阿里巴巴'],start_date,end_date)
+#babaDf.head()
+
+fileNameStr=(r'C:\Users\zhangqiang24\Desktop\MOOC\跟猴子学习人工智能核心技术\数据分析入门（Python）\第3关统计概率思维：描述统计学\阿里巴巴2017年股票数据.xlsx')
+xl = pd.ExcelFile(fileNameStr)
+alibabaDf=xl.parse('Sheet1')
+alibabaDf.head()
+alibabaDf.describe()
+
+#定义函数描述股票涨跌幅
+def change(column):
+    buyprice=column[0]
+    curprice=column[column.size - 1]
+    priceChange=(curprice - buyprice)/buyprice
+    if priceChange>0:
+        print('股票累计上涨=',priceChange)
+    elif priceChange==0:
+        print('股票累计没有变化=',priceChange)
+    else:
+        print('股票累计下跌=',priceChange)
+    return priceChange
+
+closeCol=alibabaDf['Close']
+alibabachange=change(closeCol)
+
+import matplotlib.pyplot as plt
+plt.plot(alibabaDf['Close'])
+plt.title('alibaba')
+plt.grid(True)
+plt.show()
