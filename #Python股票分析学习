@@ -37,3 +37,99 @@ plt.plot(alibabaDf['Close'])
 plt.title('alibaba')
 plt.grid(True)
 plt.show()
+
+###进阶代码
+import numpy as np
+import pandas as pd
+from datetime import datetime
+import pandas_datareader as pdr
+from pandas import Series,DataFrame
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+start=datetime(2013,1,1)
+fb= pdr.get_data_morningstar('FB',start=start)
+fb.head()
+apple=pdr.get_data_morningstar('AAPL',start=start)
+apple.head()
+
+fb.info()
+apple.info()
+
+fb.describe()
+apple.describe()
+
+#涨跌幅分析
+def change(column):
+    buyprice=column[0]
+    curprice=column[column.size - 1]
+    pricechange=(curprice-buyprice)/buyprice
+    if(pricechange>0):
+        print('股票累计上涨=',pricechange)
+    elif(pricechange==0):
+        print('股票累计没有变化=',pricechange)
+    else:
+        print('股票累计下跌=',pricechange)
+    
+    #返回数据
+    return pricechange
+
+fbchange=change(fb['Close'])
+applechange=change(apple['Close'])
+
+#收盘价图形展示
+fb['Close'].plot(legend=True,label='fb')
+apple['Close'].plot(legend=True,label='aapl')
+plt.grid(True)
+plt.show()
+
+#日最高价与最低价差
+fb['high-low']=fb['High'] - fb['Low']
+fb.head()
+apple['high-low']=apple['High'] - apple['Low']
+apple.head()
+
+fb['high-low'].plot(legend=True,label='fb',figsize=(18,10),linestyle='--',marker='o')
+apple['high-low'].plot(legend=True,label='aapl',figsize=(18,10),linestyle='--',marker='o')
+plt.grid(True)
+plt.show()
+
+#现在是每一天之间交易的闭市的价格价差，就是天与天之间的变化，这个有个名词叫做daily return
+fb['daily-return']=fb['Close'].pct_change()
+fb.head()
+apple['daily-return']=apple['Close'].pct_change()
+
+fb['daily-return'].plot(legend=True,label='fb',figsize=(18,10),linestyle='--',marker='o')
+apple['daily-return'].plot(legend=True,label='aapl',figsize=(18,10),linestyle='--',marker='o')
+plt.grid(True)
+plt.show()
+#直方图
+sns.distplot(fb['daily-return'].dropna(),bins=100,color='purple')
+plt.show()
+sns.distplot(apple['daily-return'].dropna(),bins=100,color='purple')
+plt.show()
+#风险分析
+#绘制平均线，5日，10日，20日，50日，200日
+maday=[5,10,20,50,200]
+for ma in maday:
+    column_name="MA is %s days"%(str(ma))
+    fb[column_name]=pd.rolling_mean(fb['Close'],ma)
+    apple[column_name]=pd.rolling_mean(apple['Close'],ma)
+fb.head()
+apple.head()
+
+fb[["MA is 5 days",
+   "MA is 10 days",
+   "MA is 20 days",
+   "MA is 50 days",
+   "MA is 200 days"]].plot(legend=True,label='fb',figsize=(18,18))
+plt.grid(True)
+plt.show()
+
+apple[["MA is 5 days",
+   "MA is 10 days",
+   "MA is 20 days",
+   "MA is 50 days",
+   "MA is 200 days"]].plot(legend=True,label='fb',figsize=(18,18))
+plt.grid(True)
+plt.show()
